@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  
+  <!-- Include Select2 CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/font-awesome@4.7.0/css/font-awesome.min.css">
+
+  <!-- Include jQuery (if not included already) -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <!-- Include Select2 JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      margin-top: 15px;
+    }
+
+    input, select {
+      width: 100%;
+      box-sizing: border-box;
+      height: 25px;
+    }
+
+    input {
+      padding: 8px;
+    }
+
+
+    #loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #loading {
+      font-style: italic;
+      color: #333;
+    }
+
+    .input_container_nested {
+      border: 1px solid #8c98a0;
+    }
+
+    .input_block_title {
+      background-color: #e7eff4;
+      padding: 3px 0px 3px 4px;
+      color: black;
+      border-left: 1px solid #8c98a0;
+      border-right: 1px solid #8c98a0;
+      border-top: 1px solid #8c98a0;
+      border-top-right-radius: 2px;
+      border-top-left-radius: 2px;
+    }
+
+    .input_inner_block {
+      padding: 6px;
+      border: 1px solid #8c98a0;
+      border-bottom-right-radius: 2px;
+      border-bottom-left-radius: 2px;
+      min-height: 40px;
+      position: relative;
+      /* Adjust this value based on your design */
+    }
+
+    .input_label {
+      font-weight: bold;
+      margin-left: 1px;
+      font-size: 12px;
+    }
+
+    .flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #sheetName {
+      flex-grow: 1;
+    }
+
+    #set_active_destination {
+      margin-left: 6px;
+      color: grey;
+      font-weight: bold;
+      font-family: arial, sans-serif;
+      white-space: nowrap;
+      text-align: center;
+      box-shadow: none;
+      border: 1px solid #dcdcdc;
+    }
+
+    .starting_cell {
+      font-size: 11px;
+      margin-left: 1px;
+      color: #4d4d4d;
+      margin-top: 2px;
+    }
+
+    #cellRef {
+      font-size: 10px;
+      width: 40px;
+      height: 16px;
+      margin-top: 2px;
+      color: #4d4d4d;
+    }
+
+    #run_request {
+      background: -webkit-linear-gradient(top, #4d90fe, #357ae8);
+      color: #fff;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      margin: 5px 0px 5px 5px;
+    }
+
+    .input-label.name {
+      margin-right: 4px;
+    }
+
+    #name {
+      width: 82%;
+      margin-left: 4px;
+      margin-bottom: 0;
+      /* Reset bottom margin */
+    }
+
+    .run_buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+
+    #run_request {
+      color: grey;
+      font-weight: bold;
+      font-family: arial, sans-serif;
+      white-space: nowrap;
+      text-align: center;
+      box-shadow: none;
+      border: 1px solid #dcdcdc;
+      height: 27px;
+      flex-grow: 1;
+      margin: 0 4px;
+    }
+
+    #run_request {
+      color: white;
+    }
+
+    select#constantContactEndpoint {
+      width: 100%;
+      height: 28px;
+      padding: 5px;
+      /* Adjust padding as needed */
+      font-size: 14px;
+      /* Adjust font size as needed */
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    select#constantContactEndpoint option {
+      background-color: #fff;
+      color: #333;
+    }
+
+    .select2-container {
+      box-sizing: border-box;
+      display: block;
+      margin: 0;
+      width: 100% !important;
+      position: relative;
+    }
+
+    select#constantContactEndpoint:focus {
+      outline: none;
+      border-color: #dcdcdc;
+    }
+
+    select#application {
+      width: 100%;
+      height: 28px;
+      padding: 5px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    select#application option {
+      background-color: #fff;
+      color: #333;
+    }
+
+    select#application:focus {
+      outline: none;
+      border-color: #dcdcdc;
+    }
+
+    .img-flag {
+      height: 16px;
+      margin-right: 8px;
+      margin-top: 3px;
+    }
+
+    .http-method {
+      font-size: 10px;
+      padding: 2px 4px;
+      margin-right: 6px;
+      border-radius: 2px;
+      border: 1px solid #c6c6c6;
+    }
+
+    .select2-results__option {
+      border-bottom: 1px dashed #dedede;
+      padding: 5px;
+    }
+
+    #select2-constantContactEndpoint-container {
+      font-size: 12px;
+    }
+
+    .additional_input_label {
+      font-size: 12px;
+    }
+
+    .data-entry-container {
+      height: 29px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #ccc;
+      padding: 5px;
+      margin-top: 5px;
+    }
+
+    .name-entry {
+      font-size: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      flex: 1 1 auto;
+    }
+
+    .select-entry .select2-container--default .select2-selection--single {
+      border-radius: 0;
+    }
+
+    .select-entry .select2-container--default .select2-selection--single .select2-selection__rendered {
+      color: black;
+    }
+
+    .select-entry .select2-container--default .select2-results__option {
+      color: black;
+    }
+
+    .select-entry .select2-container--default .select2-results__option[aria-selected="true"] {
+      background-color: #ccc;
+      color: black;
+    }
+
+    .select-entry {
+      font-size: 12px;
+    }
+
+    .action-select {
+      min-width: 68px;
+      text-align: left;
+      font-weight: normal;
+    }
+
+    #create_request {
+      font-size: .8rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      border: 0px;
+      line-height: 27px;
+      margin: 0;
+      min-width: 72px;
+      outline: 0;
+      padding: 0 8px;
+      text-align: center;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
+      background: -webkit-linear-gradient(top, #4d90fe, #357ae8);
+      color: #fff;
+    }
+
+    #manage_request_btn {
+      font-size: .8rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      border: 1px solid #8c98a0;
+      color: grey;
+      height: 27px;
+      background: -webkit-linear-gradient(top, #f5f5f5, #f1f1f1);
+      font-family: arial, sans-serif;
+      line-height: 27px;
+      margin: 0;
+      min-width: 72px;
+      outline: 0;
+      padding: 0 8px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    #manage_request {
+      margin-top: 16px;
+    }
+
+    #save_request {
+      color: #777;
+      margin-left: 12px;
+      height: 27px;
+      background: -webkit-linear-gradient(top, #f5f5f5, #f1f1f1);
+      border: 1px solid #dcdcdc;
+      border-radius: 2px;
+      box-shadow: none;
+      cursor: default;
+      font-family: arial, sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      line-height: 27px;
+      margin: 0;
+      min-width: 72px;
+      outline: 0;
+      padding: 0 8px;
+      text-align: center;
+      white-space: nowrap;
+      transition: border 0.2s, color 0.2s;
+    }
+
+    #save_request:hover {
+      border: 1px solid #ccc;
+      color: #000;
+    }
+
+    #block {
+      display: flex;
+      font-size: 12px;
+    }
+
+    .input_label_name {
+      margin-right: 4px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .savename {
+      font-size: 12px;
+      color: #444;
+    }
+
+    /*  */
+
+  .accordion-wrapper {
+    border: 1px solid #e9e9e9;
+    margin: 4px 0;
+  }
+
+  .accordion-wrapper {
+      border: 1px solid #e9e9e9;
+      margin: 4px 0;
+  }
+
+  .accordion-heading {
+      padding: 0px 0px 0px 2px;
+      background-color: #f5f5f5;
+      font-weight: bold;
+      cursor: pointer;
+  }
+
+  .accordion-heading {
+      padding: 0px 0px 0px 2px;
+      background-color: #f5f5f5;
+      font-weight: bold;
+      cursor: pointer;
+  }
+
+  .request-parameter-heading-wrapper .request-parameter-name-wrapper {
+      font-weight: bold;
+  }
+
+  .request-parameter-heading-wrapper > div {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1 1 auto;
+  }
+
+  .accordion-wrapper.accordion-closed .accordion-icon::before {
+      content: "\f067";
+      font-size: 9px;
+  }
+
+  .accordion-icon::before {
+      font-family: "FontAwesome";
+      padding: 1px;
+      border: 1px solid #dedede;
+      background-color: #fff;
+      margin-right: 1em;
+  }
+
+  .request-parameter-heading-wrapper .request-parameter-name-wrapper {
+      font-weight: bold;
+  }
+
+  .request-parameter.required .request-parameter-name::after {
+      content: " * required";
+      color: #b20000;
+  }
+
+  .request-parameter-heading-wrapper .request-parameter-name-wrapper {
+      font-weight: bold;
+  }
+
+  .request-parameter-heading-wrapper .request-parameter-preview-value {
+    padding-right: 1em;
+    padding-left: 1em;
+    max-width: 8em;
+    min-width: 2em;
+    text-align: right;
+    color: #777;
+  }
+  .request-parameter-heading-wrapper > div {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1 1 auto;
+  }
+
+  .accordion-wrapper.accordion-closed .accordion-content {
+      display: none;
+  }
+  .accordion-content {
+      padding: 8px;
+  }
+
+  .request-parameter {
+      font-size: 10px;
+      word-break: break-all;
+  }
+
+  .request-parameter .accordion-content input, .request-parameter .accordion-content select {
+      margin-top: 0.5em;
+      font-size: 10px;
+  }
+
+  input[type=text], select {
+      font-size: 12px;
+      color: #444;
+  }
+
+  .accordion-wrapper.accordion-open .accordion-icon::before {
+    content: "\f068";
+    font-size: 9px;
+  }
+  .accordion-icon::before {
+      font-family: "FontAwesome";
+      padding: 1px;
+      border: 1px solid #dedede;
+      background-color: #fff;
+      margin-right: 1em;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="input_container" id="inputContainer">
+    <div class="input_container_nested">
+      <div class="input_block_title">
+        <b>Constant Contact API Connector</b>
+      </div>
+      <div class="input_inner_block">
+        <label for="application">API</label>        
+        <select id="application" name="application" class="custom-select" onchange="updateApiUrl()">
+          <option value="v2AppConnectAPI" data-icon="https://static.ctctcdn.com/ui/images1/favicon/favicon.png?rb=2" selected>v2 AppConnect API</option>
+        </select>
+      </div>
+      <div class="input_block_title">
+        <b>CONFIGURE API REQUEST</b>
+      </div>
+      <div class="input_inner_block">
+        <label for="constantContactEndpoint">Endpoint</label>
+        
+        <select id="constantContactEndpoint" name="constantContactEndpoint" class="custom-select" style="display: none;">
+          <option value="accountInfo" data-method="GET" data-endpoint="/account/info" title="Get account summary information">/account/info</option>
+          <option value="contacts" data-method="GET" data-endpoint="/contacts" title="Get Contacts">/contacts</option>
+          <option value="contactLists" data-method="GET" data-endpoint="/lists" title="Retrieve a collection of ContactLists">/lists</option>
+          <option value="campaigns" data-method="GET" data-endpoint="/emailmarketing/campaigns" title="Retrieve a list of email campaigns">/emailmarketing/campaigns</option>
+        </select>
+
+        <div id="apikeydiv">
+          <label for="apiKey" class="additional_input_label">Your API key (see here for info on getting your key).</label>
+          <input type="text" id="apiKey" name="apiKey" placeholder="Enter API Key">
+        </div>
+
+        <label for="headers">Headers</label>
+
+        <div id="apiParametersHeaders">
+          <div class="request-parameter accordion-wrapper accordion-open required">
+            <div class="accordion-heading">
+              <div class="request-parameter-heading-wrapper">
+                <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Authorization</span></div>
+                <div class="request-parameter-preview-value"></div>
+              </div>
+            </div>
+            <div class="accordion-content">
+              <div class="request-parameter-description">Enter access token</div>
+              <input type="text" name="authorization" required="" placeholder="" class="request-parameter-input" id="authorization" data-name="authorization" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+            </div>
+          </div>
+        </div>
+        <div id="apiParameters">
+          <label for="request-parameters">Request parameters</label>
+          <div id="contractsParams" style="display: none;">
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Email</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Search for a contact by email address</div>
+                <input type="text" name="email" placeholder="" class="request-parameter-input email" data-name="email" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+              </div>
+            </div>
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Status</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Filter the response based on the contact status property</div>
+                <select type="text" name="status" class="request-parameter-input status" data-name="status" data-type="text" data-in="header" data-inputs="" data-options="" data-format="">
+                  <option value=""></option>
+                  <option value="ALL">ALL</option>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="UNCONFIRMED">UNCONFIRMED</option>
+                  <option value="OPTOUT">OPTOUT</option>
+                  <option value="orREMOVED">orREMOVED</option>
+                </select>
+              </div>
+            </div>
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Limit</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Number of contacts to return per page, 1-500, default 50</div>
+                <input type="number" name="limit" placeholder="" class="request-parameter-input limit" data-name="limit" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+              </div>
+            </div>
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Modified Since</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Retrieve only contacts modified since the time specified</div>
+                <input type="text" name="modified_since" placeholder="" class="request-parameter-input modified-since" data-name="modified_since" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+              </div>
+            </div>
+          </div>
+          <div id="contractsListsParams" style="display: none;">
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Modified Since</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Retrieve only contacts modified since the time specified</div>
+                <input type="text" name="modified_since" placeholder="" class="request-parameter-input modified-since" data-name="modified_since" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+              </div>
+            </div>
+          </div>
+          <div id="emailCampaignsParams">
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Status</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Filter the response based on the contact status property</div>
+                <select type="text" name="status" class="request-parameter-input status" data-name="status" data-type="text" data-in="header" data-inputs="" data-options="" data-format="">
+                  <option value=""></option>
+                  <option value="ALL">ALL</option>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="UNCONFIRMED">UNCONFIRMED</option>
+                  <option value="OPTOUT">OPTOUT</option>
+                  <option value="orREMOVED">orREMOVED</option>
+                </select>
+              </div>
+            </div>
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Limit</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Number of contacts to return per page, 1-500, default 50</div>
+                <input type="number" name="limit" class="request-parameter-input limit" data-name="limit" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+              </div>
+            </div>
+            <div class="request-parameter accordion-wrapper accordion-closed">
+              <div class="accordion-heading">
+                <div class="request-parameter-heading-wrapper">
+                  <div class="request-parameter-name-wrapper"><span class="request-parameter-name accordion-icon">Modified Since</span></div>
+                  <div class="request-parameter-preview-value"></div>
+                </div>
+              </div>
+              <div class="accordion-content">
+                <div class="request-parameter-description">Retrieve only contacts modified since the time specified</div>
+                <input type="text" name="modified_since" placeholder="" class="request-parameter-input modified-since" data-name="modified_since" data-type="text" data-in="header" data-inputs="" data-options="" data-format="" value="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="input_container_nested">
+      <div class="input_block_title">
+        <b>RUN REQUEST</b>
+      </div>
+      <div class="input_inner_block">
+        <div class="run_buttons">
+          <button type="button" id="run_request" onclick="fetchData()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Loading indicator container -->
+  <div id="loading-container">
+    <div id="loading">Loading...</div>
+  </div>
+
+  <script type="text/javascript">
+    window.onload = function () {
+      updateApiUrl();
+    };
+
+    // Function to reload the sidebar
+    function reloadSidebar() {
+      document.getElementById('loading-container').style.display = 'flex';
+
+      google.script.run.withSuccessHandler(function (html) {
+        document.getElementById('loading-container').style.display = 'none';
+        document.documentElement.innerHTML = html;
+      }).showSidebar();
+    }
+    
+    document.getElementById('constantContactEndpoint').addEventListener('change', handleConstantContactEndpointSelection);
+
+    $(document).ready(function () {
+      $('#application').select2({
+        templateResult: formatOption,
+        templateSelection: formatSelection,
+      });
+
+      // Function to format the options with images
+      function formatOption(option) {
+        if (!option.id) return option.text;
+
+        var $option = $(
+          '<span><img src="' + $(option.element).data('icon') + '" class="img-flag" /> ' + option.text + '</span>'
+        );
+
+        return $option;
+      }
+
+      // Function to format the selected option
+      function formatSelection(option) {
+        if (!option.id) {
+          return option.text;
+        }
+
+        var $selection = $(
+          '<span><img src="' + $(option.element).data('icon') + '" class="img-flag" /> ' + option.text + '</span>'
+        );
+
+        return $selection;
+      }
+    });    
+
+    // Function to display the response received from the endpoint on Google Sheets by calling the Google Apps Script function
+    function fetchData() {
+      if (validation()) {
+        var selectedApplication = document.getElementById('application').value;
+        var apiUrlWithApiKey = buildConstantContactApiUrl();
+        var selectedEndpoint = document.getElementById('constantContactEndpoint').value;
+        var authToken = document.getElementById('authorization').value;
+
+        if (selectedEndpoint === 'accountInfo') {
+          document.getElementById('loading-container').style.display = 'flex';
+          
+          // Call the specific function for "accountInfo" forecast
+          google.script.run.withSuccessHandler(function () {
+            google.script.run.saveUserAction(true);
+            // Hide loading container when done
+            document.getElementById('loading-container').style.display = 'none';
+          }).fetchConstantContactAccountInfoData(apiUrlWithApiKey, authToken);
+
+          return;
+        } else if (selectedEndpoint === 'contacts') {
+          document.getElementById('loading-container').style.display = 'flex';
+          
+          // Call the specific function for "contacts" forecast
+          google.script.run.withSuccessHandler(function () {
+            google.script.run.saveUserAction(true);
+            // Hide loading container when done
+            document.getElementById('loading-container').style.display = 'none';
+          }).fetchConstantContactContactsData(apiUrlWithApiKey, authToken);
+
+          return;
+        } else if (selectedEndpoint === 'contactLists') {
+          document.getElementById('loading-container').style.display = 'flex';
+          
+          // Call the specific function for "contactLists" forecast
+          google.script.run.withSuccessHandler(function () {
+            google.script.run.saveUserAction(true);
+            // Hide loading container when done
+            document.getElementById('loading-container').style.display = 'none';
+          }).fetchConstantContactContactListsData(apiUrlWithApiKey, authToken);
+
+          return;
+        } else if (selectedEndpoint === 'campaigns') {
+          document.getElementById('loading-container').style.display = 'flex';
+          
+          // Call the specific function for "campaigns" forecast
+          google.script.run.withSuccessHandler(function () {
+            google.script.run.saveUserAction(true);
+            // Hide loading container when done
+            document.getElementById('loading-container').style.display = 'none';
+          }).fetchConstantContactCampaignsData(apiUrlWithApiKey, authToken);
+
+          return;
+        }
+      }
+    }
+
+    // Function for validating authentication information input
+    function validation() {
+      var apiKey = document.getElementById('apiKey').value;
+      var authorization = document.getElementById('authorization').value;
+
+      if (!apiKey) {
+        document.getElementById('apiKey').focus();
+        return false;
+      } else if (!authorization) {
+        document.getElementById('authorization').focus();
+        return false;
+      }
+
+      return true;
+    }
+
+    // Add a function to build the Constant Contact API URL based on the selected endpoint
+    function buildConstantContactApiUrl() {
+      var selectedEndpoint = document.getElementById('constantContactEndpoint').value;
+      var apiKey = document.getElementById('apiKey').value;
+
+      console.log(selectedEndpoint);
+      // Handle different Constant Contact API endpoints
+      switch (selectedEndpoint) {
+        case 'accountInfo':
+          return `https://api.constantcontact.com/v2/account/info?api_key=${apiKey}`;
+          break;
+        case 'contacts':
+          var apiUrl = `https://api.constantcontact.com/v2/contacts?api_key=${apiKey}`;
+          var email = $('#contractsParams .email').val();
+          var status = $('#contractsParams .status').val();
+          var limit = $('#contractsParams .limit').val();
+          var modified_since = $('#contractsParams .modified-since').val();
+
+          if (email) apiUrl += `&email=${email}`;
+          if (status) apiUrl += `&status=${status}`;
+          if (limit) apiUrl += `&limit=${limit}`;
+          if (modified_since) apiUrl += `&modified_since=${modified_since}`;
+          
+          return apiUrl;
+          break;
+        case 'contactLists':
+          var apiUrl = `https://api.constantcontact.com/v2/lists?api_key=${apiKey}`;
+          var modified_since = $('#contractsListsParams .modified-since').val();
+
+          if (modified_since) apiUrl += `&modified_since=${modified_since}`;
+
+          return apiUrl;
+          break;
+        case 'campaigns':
+          var apiUrlWithApiKey = `https://api.constantcontact.com/v2/emailmarketing/campaigns?api_key=${apiKey}`;
+
+          var apiUrl = `https://api.constantcontact.com/v2/emailmarketing/campaigns?api_key=${apiKey}`;
+          var status = $('#emailCampaignsParams .status').val();
+          var limit = $('#emailCampaignsParams .limit').val();
+          var modified_since = $('#emailCampaignsParams .modified-since').val();
+
+          if (status) apiUrl += `&status=${status}`;
+          if (limit) apiUrl += `&limit=${limit}`;
+          if (modified_since) apiUrl += `&modified_since=${modified_since}`;
+          
+          return apiUrl;
+          break;
+      }
+
+      return '';
+    }
+
+    function updateApiUrl() {      
+      handleConstantContactEndpointSelection();
+    }
+
+    // Handle for selecting different Constant Contact API endpoints 
+    function handleConstantContactEndpointSelection() {
+      var constantContactSelect = document.getElementById('constantContactEndpoint');
+      var selectedOption = constantContactSelect.options[constantContactSelect.selectedIndex];
+      var method = selectedOption.getAttribute('data-method');
+      var endpoint = selectedOption.getAttribute('data-endpoint');      
+
+      var apiParameters = document.getElementById('apiParameters');
+      var contractsParams = document.getElementById('contractsParams');
+      var contractsListsParams = document.getElementById('contractsListsParams');
+      var emailCampaignsParams = document.getElementById('emailCampaignsParams');
+
+      apiParameters.style.display = 'none';
+      contractsParams.style.display = 'none';
+      contractsListsParams.style.display = 'none';
+      emailCampaignsParams.style.display = 'none';
+
+      switch (endpoint) {
+        case '/contacts':
+          apiParameters.style.display = 'block';
+          contractsParams.style.display = 'block';
+          break;
+        case '/lists':
+          apiParameters.style.display = 'block';
+          contractsListsParams.style.display = 'block';
+          break;
+        case '/emailmarketing/campaigns':
+          apiParameters.style.display = 'block';
+          emailCampaignsParams.style.display = 'block';
+          break;
+        default:
+          break;
+      }
+    }
+
+    // Call the function when the document is ready
+    $(document).ready(function () {      
+      $('#constantContactEndpoint').select2({
+        templateResult: formatOption,
+        templateSelection: formatOptionSelection
+      });
+
+      $('#constantContactEndpoint').on('change', function () {
+        handleConstantContactEndpointSelection();
+      });
+
+      $('.request-parameter .accordion-heading').on('click', function() {
+        $(this).parent().toggleClass('accordion-closed');
+        $(this).parent().toggleClass('accordion-open');
+      });
+    });
+
+    // Function to format the result in the dropdown
+    function formatOption(option) {
+      if (!option.id) {
+        return option.text;
+      }
+
+      var method = $(option.element).data('method');
+      var endpoint = $(option.element).data('endpoint');
+      var title = $(option.element).attr('title');
+      var contentHtml = '<span class="http-method">' + method + '</span>&nbsp;&nbsp;' + endpoint;
+
+      // Conditional styling based on the HTTP method
+      var divStyle = (method === 'GET') ? 'style="font-size: 10px; margin-top: 10px;"' : '';
+      var optionHtml = '<div title="' + title + '" style="font-size: 10px; font-weight: bold;">' + title + '</div><div ' + divStyle + '><span>' + contentHtml + '</span></div>';
+
+      return $(optionHtml);
+    } 
+    
+    // Function to format the selection
+    function formatOptionSelection(option) {
+      return option.text;
+    }
+  </script>
+</body>
+
+</html>
